@@ -13,9 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 @Configuration
 public class FirebaseConfig {
@@ -26,15 +25,11 @@ public class FirebaseConfig {
     public FirebaseApp initializeFirebase() {
         try {
             if (FirebaseApp.getApps().isEmpty()) {
-                logger.info("Initializing Firebase from environment variable...");
+                logger.info("Initializing Firebase from local file path...");
 
-                // Load credentials from FIREBASE_SERVICE_ACCOUNT environment variable
-                String firebaseCredentials = System.getenv("FIREBASE_SERVICE_ACCOUNT");
-                if (firebaseCredentials == null || firebaseCredentials.isEmpty()) {
-                    throw new IllegalStateException("FIREBASE_SERVICE_ACCOUNT environment variable is not set");
-                }
-                InputStream serviceAccount = new ByteArrayInputStream(
-                        firebaseCredentials.getBytes(StandardCharsets.UTF_8));
+                // Directly accessing file from src/main/resources during development
+                String filePath = "src/main/resources/serviceAccountKey.json";
+                InputStream serviceAccount = new FileInputStream(filePath);
 
                 FirebaseOptions options = FirebaseOptions.builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -42,13 +37,13 @@ public class FirebaseConfig {
                         .build();
 
                 FirebaseApp app = FirebaseApp.initializeApp(options);
-                logger.info("Firebase initialized successfully using environment variable");
+                logger.info("Firebase initialized successfully using local path: {}", filePath);
                 return app;
             } else {
                 return FirebaseApp.getInstance();
             }
         } catch (Exception e) {
-            logger.error("Failed to initialize Firebase from environment variable: ", e);
+            logger.error("Failed to initialize Firebase from local path: ", e);
             throw new RuntimeException("Firebase initialization failed", e);
         }
     }

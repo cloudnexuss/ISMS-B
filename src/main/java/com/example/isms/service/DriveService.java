@@ -21,9 +21,11 @@ public class DriveService {
 
     private static Drive getDriveService() throws Exception {
         GoogleCredentials credentials = GoogleCredentials
-                .fromStream(new ByteArrayInputStream(
-                        System.getenv("DRIVE_SERVICE_ACCOUNT").getBytes(StandardCharsets.UTF_8)))
+                .fromStream(new FileInputStream("src/main/resources/isms-file-store-6a965ee8bd7c.json"))
                 .createScoped(Collections.singleton(DriveScopes.DRIVE));
+
+
+
         return new Drive.Builder(new NetHttpTransport(),
                 com.google.api.client.json.gson.GsonFactory.getDefaultInstance(),
                 new HttpCredentialsAdapter(credentials))
