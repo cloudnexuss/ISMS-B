@@ -10,7 +10,9 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.http.FileContent;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,9 +21,9 @@ public class DriveService {
 
     private static Drive getDriveService() throws Exception {
         GoogleCredentials credentials = GoogleCredentials
-                .fromStream(new FileInputStream("src/main/resources/isms-file-store-6a965ee8bd7c.json"))
+                .fromStream(new ByteArrayInputStream(
+                        System.getenv("DRIVE_SERVICE_ACCOUNT").getBytes(StandardCharsets.UTF_8)))
                 .createScoped(Collections.singleton(DriveScopes.DRIVE));
-
         return new Drive.Builder(new NetHttpTransport(),
                 com.google.api.client.json.gson.GsonFactory.getDefaultInstance(),
                 new HttpCredentialsAdapter(credentials))
